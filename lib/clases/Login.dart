@@ -8,7 +8,7 @@ import 'package:notifications_only/clases/libs/UserModel.dart';
 import 'package:notifications_only/clases/Welcome.dart';
 import 'dart:async';
 import 'package:scoped_model/scoped_model.dart';
-import 'package:device_id/device_id.dart';
+//import 'package:device_id/device_id.dart';
 import 'package:device_info/device_info.dart';
 
 
@@ -44,11 +44,11 @@ class _LoginState extends State<Login> {
   @override
   void initState() {
     // TODO: implement initState
-    __init__();
+    init__();
     super.initState();
   }
 
-  void __init__(){
+  void init__(){
     requests = new Post();
     getSlots = new GetSlots(context: context, request: requests,);
   }

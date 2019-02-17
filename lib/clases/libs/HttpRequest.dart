@@ -3,13 +3,14 @@ import 'package:crypto/crypto.dart';
 import 'dart:async';
 import 'dart:io';
 import 'package:crypto/src/digest_sink.dart';
-import 'package:flutter/material.dart';
+//import 'package:flutter/material.dart';
 import 'dart:convert';
 
 class Post {
 
 
-  String IPAddress = 'https://192.168.0.48:8181/';
+  //String IPAddress = 'https://192.168.0.48:8181/';
+  String IPAddress = 'https://178.134.198.58:8181/';
 
   Future<Map> fetchPost(Map<String, String> body, String path,{context}) async {
 
@@ -20,7 +21,7 @@ class Post {
       if(key != 'hsh' && key != 'permissions')
         hsh += key+''+value.toString();
     });
-    var hmacSha256 = new Hmac(sha1, utf8.encode(hsh));
+    //var hmacSha256 = new Hmac(sha1, utf8.encode(hsh));
     var ds = new DigestSink();
     var s = sha1.startChunkedConversion(ds);
     s.add(utf8.encode(hsh));
@@ -37,7 +38,8 @@ class Post {
     http.IOClient client = new http.IOClient(httpClient);
     //print("dialog status is: "+dialogStatus.toString());
     http.Response res;
-    num statusCode = 0;
+    // ignore: unused_local_variable
+    int statusCode = 0;
 
 
     try{

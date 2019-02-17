@@ -7,7 +7,7 @@ import 'package:scoped_model/scoped_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/services.dart';
-import 'package:notifications_only/clases/libs/Parent.dart';
+//import 'package:notifications_only/clases/libs/Parent.dart';
 import 'package:notifications_only/clases/Welcome.dart';
 import 'package:notifications_only/clases/Login.dart';
 import 'package:async_loader/async_loader.dart';
