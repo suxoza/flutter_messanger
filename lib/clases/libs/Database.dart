@@ -29,7 +29,8 @@ class DBProvider {
               "user_id int,"
               "user varchar,"
               "firstName varchar,"
-              "lastName varchar"
+              "lastName varchar,"
+              "permToString varchar"
               ")");
 
           await db.execute("create table messages ("
@@ -52,10 +53,12 @@ class DBProvider {
     return insertID;
   }
 
-  Future<int> getUser() async {
+  Future<int> getUserID() async {
     final db = await database;
     return Sqflite.firstIntValue(await db.rawQuery("select user_id from user_info"));
   }
+
+
 
   Future<int> addMessages(Message message) async {
     final db = await database;
@@ -67,10 +70,11 @@ class DBProvider {
     final db = await database;
     start = start == 1?0:start;
     String query = "";
+    String permSQL = perm.length > 0?" and perm in ("+perm.join(',')+") ":"";
     if(favorited)
-      query = "select * from messages where favorited = 1 and perm in ("+perm.join(',')+") limit ${start}, ${end}";
+      query = "select * from messages where favorited = 1 "+permSQL+" limit ${start}, ${end}";
     else
-      query = "select * from messages where perm in ("+perm.join(',')+") limit ${start}, ${end}";
+      query = "select * from messages where 1  "+permSQL+" limit ${start}, ${end}";
 
     var res = await db.rawQuery(query);
     print(query);

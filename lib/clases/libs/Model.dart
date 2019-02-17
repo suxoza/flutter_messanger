@@ -94,7 +94,7 @@ class MyModel extends Model{
     notifyListeners();
   }
 
-  static bool NotificationsStatus = false;
+  static bool NotificationsStatus = true;
   static num LastPersonalDataMessageId = 0;
 
 

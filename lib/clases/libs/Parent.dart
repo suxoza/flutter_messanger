@@ -5,6 +5,7 @@ import 'package:notifications_only/clases/libs/Model.dart';
 import 'package:flutter/material.dart';
 import 'package:notifications_only/clases/libs/HttpRequest.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:notifications_only/clases/libs/UserModel.dart';
 
 
 abstract class Parent {
@@ -21,7 +22,9 @@ abstract class Parent {
     Map<String, String> dt = {
       'method_name': 'getStream',
       'route': 'Welcome',
-      "device_id": '11'
+      'onlyNotifications': '1',
+      //"device_id": '11',
+      'getUserPermission': '1'
     };
     print(dt);
 
@@ -47,20 +50,36 @@ abstract class Parent {
     print(MyModel.NotificationsStatus);
 
     try {
-      timer = new Timer.periodic(Duration(seconds: 5), (timer) {
+      timer = new Timer.periodic(Duration(seconds: 10), (timer) {
         //print("send interval messages: "+MyModel.NotificationsStatus.toString());
-
+        if (MyModel.of(_context).ConnectionStatus != 1){
+          print("connection error");
+          return null;
+        }
         var params = beforeCallback();
-        TimerAjax(params).then((responce) {
-          if (MyModel
-              .of(_context)
-              .ConnectionStatus != 1) return null;
-
-          if (responce['notifications'] != null) {
-            getNotifications(responce['notifications'], _context);
+        print('params is: ');
+        print(params);
+        TimerAjax(params).then((value) {
+          if (value['data']['count'] != 0) {
+            print("get responce for notifications ${value['data']['count']}");
+            if(value['data']['count'] == 1){
+              try{
+                Message message = Message.fromMap(value['data']['body'][0]);
+                getSingleNotification(message, _context);
+              }catch(e){
+                print('error is: '+e.toString());
+              }
+              //print(notification);
+              //getSingleNotification(data, context);
+            }else if(value['data']['count'] > 1){
+              value['data']['body'].forEach((v){
+                getSingleNotification(Message.fromMap(v), _context);
+              });
+            }
+            //getNotifications(responce, _context);
           }
 
-          afterCallback(responce);
+          afterCallback(value);
         });
       });
     } catch (e) {
@@ -102,38 +121,27 @@ abstract class Parent {
 
 
 
-  Future<Null> getNotifications(notifications, BuildContext context) async{
-    //print('currrent route is: '+_currentRoute);
-    //if(!MyModel.NotificationsStatus)return null;
-    //notifications.forEach((v) => print(v));
+  Future<Null> getSingleNotification(Message data, BuildContext context, {String chanelID = 'ch', String chanelName = 'ch1', String chanelDesc = 'ch2'}) async{
 
-
-    if(notifications['Bar'] != null){
-      print("current route is: "+_currentRoute);
-      if(_currentRoute != '/Bar'){
-        num current_num = MyModel.routeKeysWithNotifications['Bar']['num'];
-      }
-      //print(notifications);
-      int last_id = int.parse(notifications['Bar']['id']);
 
       if(MyModel.NotificationsStatus) {
         Map<String, dynamic> settings = {
-          'id': last_id,
-          'chanel_id': notifications['Bar']['insertDate'],
-          'changel_name': notifications['Bar']['smNom'],
-          "changel_description": notifications['Bar']['id'],
-          "title": notifications['Bar']['notification_title'],
-          "text": notifications['Bar']['notification_text'],
+          'id': data.id,
+          'chanel_id': chanelID,
+          'changel_name': chanelName,
+          "changel_description": chanelDesc,
+          "title": data.title+' '+data.id.toString(),
+          "text": data.body,
           "callback": "Bar"
         };
         showNotification(settings);
       }
-    }
+
 
   }
 
   Future<Null> onSelectNotification(String payload){
-    num ind = _items.indexOf(payload);
+    //print("selected "+payload.toString());
     //Redirect(_context, ind, MyModel.of(_context));
   }
 
@@ -152,7 +160,7 @@ abstract class Parent {
     var iOSPlatformChannelSpecifics = new IOSNotificationDetails();
     var platform = new NotificationDetails(android, iOSPlatformChannelSpecifics);
     await flutterLocalNotificationsPlugin.show(
-        params['id'], params['title'], params['text'], platform,
+        params['id'], params['title'], params['body'], platform,
         payload: params['callback']);
 
 

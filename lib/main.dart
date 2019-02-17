@@ -50,7 +50,7 @@ class _MyApp extends State<MyApp> with WidgetsBindingObserver, RouteAware{
   Future<int> asyncWait() async {
     int user_id = 0;
     try {
-      user_id = await DBProvider.db.getUser();
+      user_id = await DBProvider.db.getUserID();
     }catch(e){
 
     }
@@ -62,7 +62,7 @@ class _MyApp extends State<MyApp> with WidgetsBindingObserver, RouteAware{
     print("rebuild wholl application..............");
     AsyncLoader _asyncLoader = new AsyncLoader(
         key: _asyncLoaderState,
-        initState: () async => await DBProvider.db.getUser(),
+        initState: () async => await DBProvider.db.getUserID(),
         renderLoad: () => Scaffold(body: Center(child: new CircularProgressIndicator())),
         renderError: ([error]) =>
         new Text('Sorry, there was an error loading your joke '+error.toString()),

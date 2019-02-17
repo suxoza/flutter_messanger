@@ -81,8 +81,8 @@ Message MessageFromJson(String str) {
 class Message{
   int id;
   int perm;
-  num favorited;
-  num viewed;
+  int favorited;
+  int viewed;
   String insert_date;
   String title;
   String body;
@@ -91,8 +91,8 @@ class Message{
   factory Message.fromMap(Map<String, dynamic> json) => new Message(
     id: (json['id'] is int? json['id']: int.tryParse(json['id'])) as int,
     perm: (json['perm'] is int? json['perm']: int.tryParse(json['perm'])) as int,
-    favorited: json['favorited'] as num,
-    viewed: json['viewed'] as num,
+    favorited: json['favorited'] as int,
+    viewed: json['viewed'] as int,
     insert_date: json['insert_date'],
     title: json['title'],
     body: json['body']

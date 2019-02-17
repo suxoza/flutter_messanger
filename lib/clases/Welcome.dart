@@ -36,7 +36,7 @@ class _WelcomeState extends State<Welcome> with Parent{
     // TODO: implement initState
     print("enter in welcome, deviceID: ");
     __init__();
-    //callTimer();
+    callTimer();
 
 
 
@@ -46,7 +46,9 @@ class _WelcomeState extends State<Welcome> with Parent{
   void callTimer(){
     makeInterval((){
       print("was done 1");
-      return {};
+      return {
+        'user_id': widget.userID.toString()
+      };
     }, (responce) {
       //print(responce);
 
@@ -93,18 +95,17 @@ class _WelcomeState extends State<Welcome> with Parent{
           User user = User.fromMap(value['user']);
           MyModel.of(context).setUser(user);
           print("reload user");
-          print(MyModel
-              .of(context)
-              .getUser
-              .permissions);
+          print(MyModel.of(context).getUser.permissions);
         }
         if (value['data']['count'] > 0) {
 //          print(value['data']['permKeys']);
 //          print(MyModel.of(context).getUser.permKeys());
+        print('vv is: ');
+        print(value['data']['body']);
           value['data']['body'].forEach((v) {
             try {
               DBProvider.db.addMessages(Message.fromMap(v));
-            } on DatabaseException {
+            } on DatabaseException catch(e) {
 
             }
           });
@@ -112,15 +113,13 @@ class _WelcomeState extends State<Welcome> with Parent{
         }
 
       }catch(e){
-
+          print("internet error was found!");
+          print(MyModel.of(context).getUser);
       }finally{
         setState(() {
           rady = true;
         });
       }
-
-
-
     });
   }
 
@@ -136,6 +135,7 @@ class _WelcomeState extends State<Welcome> with Parent{
       child: Scaffold(
         appBar: AppBar(
           title: Text("Messages"),
+
           bottom: TabBar(
               tabs: [
                 Tab(
@@ -223,16 +223,21 @@ class _MyListState extends State<MyList> {
 
   Future<void> getDataLength() async {
     messagesCount = await DBProvider.db.MessagesCount(widget.favorited);
-    print("message count is: "+MyModel.of(context).counter.toString());
   }
 
   Future<void> getLocalData([bool append = false]) async {
     //MyModel.of(context).getUser.permKeys()
     print('get data: '+messagesCount.toString());
+
+    List<int> permKeys = [];
+    try{
+      permKeys = MyModel.of(context).getUser.permKeys();
+    }catch(e){}
+
     if(!append)
-      data =  await DBProvider.db.getMessages(MyModel.of(context).getUser.permKeys(), currentPage, maxLength, widget.favorited);
+      data =  await DBProvider.db.getMessages(permKeys, currentPage, maxLength, widget.favorited);
     else{
-      var dt = await DBProvider.db.getMessages(MyModel.of(context).getUser.permKeys(), currentPage, maxLength, widget.favorited);
+      var dt = await DBProvider.db.getMessages(permKeys, currentPage, maxLength, widget.favorited);
       dt.forEach((m){
         data.add(m);
       });
@@ -258,12 +263,30 @@ class _MyListState extends State<MyList> {
         headerSliverBuilder: (BuildContext context, bool inner){
           return [
             SliverAppBar(
-              leading: null,
+
               elevation: 10.0,
               automaticallyImplyLeading: false,
               backgroundColor: Color.fromRGBO(46, 55, 72, 1.0),
-              title: Text("სულ: "+messagesCount.toString())
-
+              title: Text("სულ: "+messagesCount.toString()),
+              bottom: PreferredSize(
+                preferredSize: Size.fromHeight(10.0),
+                child: ScopedModelDescendant<MyModel>(builder: (context, child, model){
+                  return model.ConnectionStatus == 0?Container(
+                    height: 30.0,
+                    alignment: Alignment.center,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Container(child: CircularProgressIndicator(strokeWidth: 3.0, valueColor: new AlwaysStoppedAnimation<Color>(Colors.red),), height: 20.0, width: 20.0,),
+                        SizedBox(width: 10.0,),
+                        Text("ინტერნეტ კავშირი ვერ მოიძებნა"),
+                      ],
+                    ),
+                    width: double.infinity,
+                    decoration: BoxDecoration(color: Colors.yellow),
+                  ):Container();
+                })
+              ),
             ),
           ];
         },
