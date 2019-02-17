@@ -38,7 +38,7 @@ class _MyApp extends State<MyApp> with WidgetsBindingObserver, RouteAware{
   final GlobalKey<AsyncLoaderState> _asyncLoaderState = GlobalKey<AsyncLoaderState>();
 
 
-  Widget activePage(){
+  void activePage(){
     num status;
     if(_connectionStatus == 'ConnectivityResult.none')
       status = 0;
@@ -106,7 +106,7 @@ class _MyApp extends State<MyApp> with WidgetsBindingObserver, RouteAware{
     }
 
     if (!mounted) {
-          return;
+          return Null;
     }
     if(_connectionStatus != connectionStatus) {
       // setState(() {
